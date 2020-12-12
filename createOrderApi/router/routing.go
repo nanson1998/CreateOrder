@@ -1,7 +1,9 @@
 package router
 
 import (
-	"Api/controller"
+	adapter "Api/adapters"
+
+	"Api/helper/redis"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,8 +13,9 @@ func SetupRouter() *gin.Engine {
 
 	client := router.Group("/api")
 	{
+		client.POST("/login", redis.Login)
 
-		client.POST("/create", controller.CreateOrder)
+		client.POST("/create", adapter.CreateOrder)
 	}
 	return router
 }
