@@ -18,10 +18,16 @@ import (
 type object map[string]interface{}
 
 var (
-	app_id = "2553"
+	appID = "2553"
 	key1   = "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL"
-	key2   = "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz"
+	key2  = "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz"
 )
+type Infor struct {
+	Amount string `form:"amount" json:"amount" xml:"amount"  binding:"required"`
+	Bank_code string `form:"bank_code" json:"bank_code" xml:"bank_code"  binding:"required"`
+	App_user string `form:"app_user"`
+	Phone string `form:"phone"`
+}
 
 func CreateOrder(c *gin.Context) {
 	rand.Seed(time.Now().UnixNano())
@@ -29,14 +35,24 @@ func CreateOrder(c *gin.Context) {
 	embedData, _ := json.Marshal(object{})
 	items, _ := json.Marshal([]object{})
 
+
 	params := make(url.Values)
-	params.Add("app_id", app_id)
-	params.Add("amount", "50000")
-	params.Add("app_user", "user123")
+	params.Add("app_id", appID)
 	params.Add("embed_data", string(embedData))
 	params.Add("item", string(items))
 	params.Add("description", "Payment for order"+strconv.Itoa(transID))
-	params.Add("bank_code", "zalopayapp")
+	// params.Add("amount", "1000")                          
+    // params.Add("app_user", "user123")                         
+    // params.Add("bank_code", "zalopayap")   
+	
+	var infor Infor
+	
+	if c.ShouldBind(&infor) == nil{
+		params.Add("amount",infor.Amount)
+		params.Add("bank_code",infor.Bank_code)
+		params.Add("app_user",infor.App_user)
+		params.Add("phone",infor.Phone)
+	}
 
 	now := time.Now()
 	params.Add("app_time", strconv.FormatInt(now.UnixNano()/int64(time.Millisecond), 10))

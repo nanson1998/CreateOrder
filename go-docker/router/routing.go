@@ -11,11 +11,15 @@ import (
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
-	client := router.Group("/api")
+	v1 := router.Group("/api")
 	{
-		client.POST("/login", redis.Login)
-
-		client.POST("/create", adapter.CreateOrder)
+	
+		v1.POST("/login", redis.Login)
+		v1.POST("/create", adapter.CreateOrder)
+		v1.POST("/query",adapter.QueryOrder)
+		v1.POST("/refund",adapter.Refund)
+		v1.POST("/queryrefund",adapter.QueryRefund)
+		v1.GET("/getlistbank",adapter.GetListBank)
 	}
 	return router
 }
