@@ -17,43 +17,54 @@ import (
 
 type object map[string]interface{}
 
-var (
-	appID = "2553"
-	key1   = "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL"
-	key2  = "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz"
+const (
+	appID = "15111"
+	key1  = "1IViCAnn06yX4arMLDMscNRn1lIOIoW2"
+	key2  = "1e7NjauDRo1NXgjS32NhQoN8NZN86lrz"
 )
+
 type Infor struct {
-	Amount string `form:"amount" json:"amount" xml:"amount"  binding:"required"`
-	Bank_code string `form:"bank_code" json:"bank_code" xml:"bank_code"  binding:"required"`
-	App_user string `form:"app_user"`
-	Phone string `form:"phone"`
+	Amount   string `form:"amount" require:"true"`
+	BankCode string `form:"bank_code"`
+	AppUser  string `form:"app_user"`
+	Phone    string `form:"phone"`
+	Email    string `form:"email"`
+	Address  string `form:"address"`
 }
 
 func CreateOrder(c *gin.Context) {
 	rand.Seed(time.Now().UnixNano())
 	transID := rand.Intn(1000000)
 	embedData, _ := json.Marshal(object{})
-	items, _ := json.Marshal([]object{})
-
+	//embedData, _ := json.Marshal(object{"bankgroup":"ATM"})
+	//items, _ := json.Marshal([]object{})
 
 	params := make(url.Values)
 	params.Add("app_id", appID)
 	params.Add("embed_data", string(embedData))
-	params.Add("item", string(items))
-	params.Add("description", "Payment for order"+strconv.Itoa(transID))
-	// params.Add("amount", "1000")                          
-    // params.Add("app_user", "user123")                         
-    // params.Add("bank_code", "zalopayap")   
-	
+	params.Add("item", "[{\"itemid\":\"knb\",\"itemname\":\"kim nguyen bao\",\"itemprice\":198400,\"itemquantity\":1}]")
+	params.Add("description", "Payment for order:"+strconv.Itoa(transID))
 	var infor Infor
-	
-	if c.ShouldBind(&infor) == nil{
-		params.Add("amount",infor.Amount)
-		params.Add("bank_code",infor.Bank_code)
-		params.Add("app_user",infor.App_user)
-		params.Add("phone",infor.Phone)
-	}
 
+	// if c.ShouldBind(&infor) == nil{
+	// 	params.Add("amount",infor.Amount)
+	// 	params.Add("bank_code",infor.BankCode)
+	// 	params.Add("app_user",infor.AppUser)
+	// 	params.Add("phone",infor.Phone)
+	// }
+	if err := c.Bind(&infor); err == nil {
+
+		params.Add("amount", infor.Amount)
+		params.Add("bank_code", infor.BankCode)
+		params.Add("app_user", infor.AppUser)
+		params.Add("phone", infor.Phone)
+		params.Add("email", infor.Email)
+		params.Add("address", infor.Address)
+		//params.Add("item",items)
+
+	} else {
+		log.Println("binding fail")
+	}
 	now := time.Now()
 	params.Add("app_time", strconv.FormatInt(now.UnixNano()/int64(time.Millisecond), 10))
 	params.Add("app_trans_id", fmt.Sprintf("%02d%02d%02d_%v", now.Year()%100, int(now.Month()), now.Day(), transID))
