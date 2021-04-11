@@ -1,15 +1,11 @@
 package main
 
 import (
-	"github.com/callicoder/go-docker/router"
-
 	"log"
+	"zalopay-api/router"
 )
 
 func main() {
-	//redis.ConnectRd()
-	//mysql.Connect()
 	r := router.SetupRouter()
-	log.Fatal(r.Run(":8081"))
-
+	log.Fatal(r.Run(":9831"))
 }
